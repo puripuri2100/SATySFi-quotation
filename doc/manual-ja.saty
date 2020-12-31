@@ -1,0 +1,29 @@
+@require: stdjareport
+@require: code
+@require: lipsum/lipsum
+
+
+
+@require: quotation/quotation
+
+
+document (|
+  title = {quotation Manual};
+  author = {Naoki Kaneko};
+|) '<
+  +p{引用を表示するためのコマンド、\code(`+quotation`);を提供します。}
+  +p{読み込みは\code(`@require: quotation/quotation`);で、モジュール名は\code(`Quotation`);です。}
+  +code(```
++quotation <
+  +p{text}
+>
+  ```);
+  +p{のようにして、引数にblock-textを与えて使用します。デザインの設定は今のところできません。}
+  +p{このようになります。↓}
+  +quotation<
+    +p{\lipsum(1);}
+    +p{\wagahai(1);}
+    +p{\wagahai(2);}
+  >
+  +p{このようになります。↑}
+>

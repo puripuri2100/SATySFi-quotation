@@ -1,0 +1,16 @@
+@require: vdecoset
+
+
+module Quotation : sig
+
+  direct +quotation : [block-text] block-cmd
+
+end = struct
+
+
+  let-block ctx +quotation bt =
+    let pads = (20pt, 0pt, 0pt, 0pt) in
+    let deco = VDecoSet.empty in
+    block-frame-breakable ctx pads deco (fun ctx -> read-block ctx bt)
+
+end
