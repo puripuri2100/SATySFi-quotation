@@ -3,14 +3,30 @@
 
 module Quotation : sig
 
-  direct +quotation : [block-text] block-cmd
+  direct +quotation : [inline-text?; (context -> ((length*length*length*length)*deco-set))?; (context -> inline-text -> block-boxes -> block-boxes)?; block-text] block-cmd
 
 end = struct
 
 
-  let-block ctx +quotation bt =
-    let pads = (20pt, 0pt, 0pt, 0pt) in
-    let deco = VDecoSet.empty in
-    block-frame-breakable ctx pads deco (fun ctx -> read-block ctx bt)
+  let-block ctx +quotation ?:title-opt ?:body-deco-fun-opt ?:title-deco-fun-opt bt =
+    let (pads, deco) =
+      match body-deco-fun-opt with
+      | None -> ((20pt, 0pt, 0pt, 0pt), VDecoSet.empty)
+      | Some(f) -> f ctx
+    in
+    block-frame-breakable ctx pads deco (fun ctx -> (
+      let body = read-block ctx bt in
+      match title-opt with
+      | None -> body
+      | Some(title) -> (
+        match title-deco-fun-opt with
+        | Some(f) -> f ctx title body
+        | None -> (
+          let title-ib = read-inline ctx title in
+          let title-bb = line-break false true ctx (inline-fil ++ title-ib) in
+          body +++ title-bb
+        )
+      )
+    ))
 
 end
