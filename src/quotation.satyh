@@ -3,12 +3,13 @@
 
 module Quotation : sig
 
+  val quotation-scheme : context -> inline-text option -> (context -> ((length*length*length*length)*deco-set)) option -> (context -> inline-text -> block-boxes -> block-boxes) option -> block-text -> block-boxes
   direct +quotation : [inline-text?; (context -> ((length*length*length*length)*deco-set))?; (context -> inline-text -> block-boxes -> block-boxes)?; block-text] block-cmd
 
 end = struct
 
 
-  let-block ctx +quotation ?:title-opt ?:body-deco-fun-opt ?:title-deco-fun-opt bt =
+  let quotation-scheme ctx title-opt body-deco-fun-opt title-deco-fun-opt bt =
     let (pads, deco) =
       match body-deco-fun-opt with
       | None -> ((20pt, 0pt, 0pt, 0pt), VDecoSet.empty)
@@ -28,5 +29,8 @@ end = struct
         )
       )
     ))
+
+  let-block ctx +quotation ?:title-opt ?:body-deco-fun-opt ?:title-deco-fun-opt bt =
+      quotation-scheme ctx title-opt body-deco-fun-opt title-deco-fun-opt bt
 
 end
