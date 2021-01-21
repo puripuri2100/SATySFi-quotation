@@ -1,29 +1,71 @@
-@require: stdjareport
+@require: stdjabook
 @require: code
+@require: itemize
 @require: lipsum/lipsum
 
 
-
+%@import: ../src/quotation
 @require: quotation/quotation
 
 
 document (|
   title = {quotation Manual};
   author = {Naoki Kaneko};
+  show-title = true;
+  show-toc = true;
 |) '<
-  +p{引用を表示するためのコマンド、\code(`+quotation`);を提供します。}
-  +p{読み込みは\code(`@require: quotation/quotation`);で、モジュール名は\code(`Quotation`);です。}
-  +code(```
+  +section {簡単な使い方} <
+    +p{引用を表示するためのコマンド、\code(`+quotation`);を提供します。}
+    +p{読み込みは\code(`@require: quotation/quotation`);で、モジュール名は\code(`Quotation`);です。}
+    +code(```
 +quotation <
   +p{text}
 >
-  ```);
-  +p{のようにして、引数にblock-textを与えて使用します。デザインの設定は今のところできません。}
-  +p{このようになります。↓}
-  +quotation<
-    +p{\lipsum(1);}
-    +p{\wagahai(1);}
-    +p{\wagahai(2);}
+    ```);
+    +p{のようにして、引数にblock-textを与えて使用します。}
+    +p{このようになります。↓}
+    +quotation<
+      +p{\lipsum(1);}
+      +p{\wagahai(1);}
+      +p{\wagahai(2);}
+    >
+    +p{このようになります。↑}
+    +p{また、引用先を表示したい場合などはオプショナル引数の形で与えることができます。}
+    +code(```
++quotation ?:({title}) <
+  +p{text}
+>
+    ```);
+    +p{の形にするだけです。}
+    +p{このようになります。↓}
+    +quotation ?:({夏目漱石（1906）， 「吾輩は猫である」}) <
+      +p{\wagahai(1);}
+      +p{\wagahai(2);}
+    >
+    +p{このようになります。↑}
   >
-  +p{このようになります。↑}
+  +section {デザインの設定} <
+    +p{このパッケージが提供する\code(`quotation-scheme`);という関数を使うことで好きなデザインのコマンドを定義することができるようになります。この関数の引数は
+    \enumerate{
+      * context
+      * 引用文の全体のデザインを設定する関数
+      * 引用先の表示のさせかたを設定する関数
+      * 引用先
+      * 本文
+    }です。型はそれぞれ
+    \enumerate{
+      * \code(`context`);
+      * \code(`(context -> ((length*length*length*length) * deco-set)) option`);
+      * \code(`(context -> inline-text -> block-boxes -> block-boxes) option`);
+      * \code(`inline-text option`);
+      * \code(`block-text`);
+    }となっています。この関数の返り値は\code(`block-boxes`);型です。}
+    +subsection{引用文の全体のデザインを設定する関数について} <
+      +p{ctxを受け取って左右上下の余白の組とdecoを返す関数です。\code(`indent-2-size-ja`);と\code(`indent-2-size-en`);を提供しており、デフォルトでは\code(`indent-2-size-ja`);が使われます。}
+    >
+    +subsection{引用先の表示のさせかたを設定する関数について} <
+      +p{タイトルとボディを受け取ってタイトルを配置する関数です。フォントを変えたい場合や、表示位置を変えたい場合などに弄る事になると思います。\code(`set-bottom-left`);を提供しており、デフォルトではこれが選ばれます。}
+      >
+    +p{実はこれらの設定用関数は\code(`+quotation`);にも与えることができ、それぞれオプショナル引数の形で、引用先の次に与えます。}
+  >
 >

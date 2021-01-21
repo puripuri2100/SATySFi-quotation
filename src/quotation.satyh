@@ -3,16 +3,37 @@
 
 module Quotation : sig
 
-  val quotation-scheme : context -> inline-text option -> (context -> ((length*length*length*length)*deco-set)) option -> (context -> inline-text -> block-boxes -> block-boxes) option -> block-text -> block-boxes
+  val indent-2-size-ja : context -> ((length*length*length*length)*deco-set)
+  val indent-2-size-en : context -> ((length*length*length*length)*deco-set)
+
+  val set-bottom-left : context -> inline-text -> block-boxes -> block-boxes
+
+  val quotation-scheme : context -> (context -> ((length*length*length*length)*deco-set)) option -> (context -> inline-text -> block-boxes -> block-boxes) option -> inline-text option -> block-text -> block-boxes
   direct +quotation : [inline-text?; (context -> ((length*length*length*length)*deco-set))?; (context -> inline-text -> block-boxes -> block-boxes)?; block-text] block-cmd
 
 end = struct
 
+  let indent-2-size-ja ctx =
+    let font-size = get-font-size ctx in
+    let (_,r,_) = get-font HanIdeographic ctx in
+    (((font-size *' r) *' 2.0, 0pt, 0pt, 0pt), VDecoSet.empty)
 
-  let quotation-scheme ctx title-opt body-deco-fun-opt title-deco-fun-opt bt =
+  let indent-2-size-en ctx =
+    let font-size = get-font-size ctx in
+    let (_,r,_) = get-font Latin ctx in
+    (((font-size *' r) *' 2.0, 0pt, 0pt, 0pt), VDecoSet.empty)
+
+
+  let set-bottom-left ctx title body =
+    let title-ib = read-inline ctx title in
+    let title-bb = line-break false true ctx (inline-fil ++ title-ib) in
+    body +++ title-bb
+
+
+  let quotation-scheme ctx body-deco-fun-opt title-deco-fun-opt title-opt bt =
     let (pads, deco) =
       match body-deco-fun-opt with
-      | None -> ((20pt, 0pt, 0pt, 0pt), VDecoSet.empty)
+      | None -> indent-2-size-ja ctx
       | Some(f) -> f ctx
     in
     block-frame-breakable ctx pads deco (fun ctx -> (
@@ -22,15 +43,12 @@ end = struct
       | Some(title) -> (
         match title-deco-fun-opt with
         | Some(f) -> f ctx title body
-        | None -> (
-          let title-ib = read-inline ctx title in
-          let title-bb = line-break false true ctx (inline-fil ++ title-ib) in
-          body +++ title-bb
-        )
+        | None -> set-bottom-left ctx title body
       )
     ))
 
+
   let-block ctx +quotation ?:title-opt ?:body-deco-fun-opt ?:title-deco-fun-opt bt =
-      quotation-scheme ctx title-opt body-deco-fun-opt title-deco-fun-opt bt
+      quotation-scheme ctx body-deco-fun-opt title-deco-fun-opt title-opt bt
 
 end
